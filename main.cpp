@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <iomanip>
 #include <vector>
 
 using namespace std;
@@ -9,45 +8,62 @@ struct flashCard{
     string question;
     string answer;
 };
-int main(){
-    //read from the saved flash card files
-    //i need a text file that stores the current files. 
-    //probably having a file that i can read from and write to
-    
-    //make a vector that hold all of the struct flashcards
-    vector<flashCard> allFlashCards = {};
 
-    //ask user to make flash cards and store into strings
+bool isEmpty();
+void readingFlashCard(vector<flashCard> &);
+void writingFlashCards(vector<flashCard>);
+
+int main(){
+    vector<flashCard> allFlashCards = {};
     string cardQuestion;
     string cardAnswer;
 
-    //test to see if you can read and write to the same file. write to it first
-    //read the first line question, read the 2nd line answer, read the third line which is empty indicating a new card. 
-    //if the line after that one is still empty, the file is over
+    string tempCardLine;
 
-    ifstream readingFromCards;
-    readingFromCards.open("flashCard.txt");
-    if(readingFromCards.is_open()){
-        cout << "Its working" << endl;
+    //ask user for their selection
+    //1. Use Flash cards
+    //2. Make new flash card
+    //3. Delete flash card
+    cout << "What would you like to do?" << endl;
+    cout << "1. Use flash card" << endl
+         <<  "2. Make new flash card" << endl 
+         << "3. Delete flash card" << endl;
+    cout << "->(1,2,3)";
+
+    int userChoice;
+    cin >> userChoice;
+}
+
+bool isEmpty(){
+    ifstream readingFile;
+    readingFile.open("flashCard.txt");
+    string storingLine = "";
+
+    if(!getline(readingFile, storingLine)){
+        return true;
+    }else{
+        if(storingLine == "")
+            return true;
+        else
+            return false;
     }
+}
+void readingFlashCard(vector<flashCard> &flashCardsStorage){
+    //expects valid file
+    ifstream readingFile;
+    readingFile.open("flashCard.txt");
 
-    ofstream writingToCards;
-    writingToCards.open("flashCard.txt");
-    if(writingToCards.is_open()){
-        cout << "Its also working" << endl;
+    string storedLine;
+    int currentIndex = 0;
+    while(getline(readingFile, storedLine)){
+        //check for "Q." or "A." in the file
+        flashCardsStorage.push_back(flashCard());
+        if(storedLine.substr(0,'.') == "Q"){
+            //energy and mineral resources will have 14-20 questions
+            flashCardsStorage[currentIndex].question = storedLine.substr(storedLine.find('.') + 1);
+        }else if(storedLine.substr(0, '.') == "A"){
+            flashCardsStorage[currentIndex].answer = storedLine.substr(storedLine.find('.') + 1);
+        }
+        currentIndex++;
     }
-
-    cout << "Write the flash card question: ";
-    getline(cin, cardQuestion);
-    cout << "Write the flash card answer: ";
-    getline(cin, cardAnswer);
-
-    writingToCards << cardQuestion << endl;
-
-    string readFrom;
-    if(getline(readingFromCards, readFrom))
-        cout << "reading worked, awesome, =)" << endl;
-    else 
-        cout << "reading didnt work, =(" << endl;
-
 }
