@@ -9,9 +9,11 @@ struct flashCard{
     string answer;
 };
 
-bool isEmpty();
-void readingFlashCard(vector<flashCard> &);
-void writingFlashCards(vector<flashCard>);
+bool isEmpty();//see if the flashCard file is empty
+void readingFlashCard(vector<flashCard> &);//reading the flash card
+void writingToFile(vector<flashCard>, ofstream);//writing flash card to file
+void creatingFlashCard(vector<flashCard> &);//create new flashcard in the vector and add to the file with writingToFile
+void useFlashCards(vector<flashCard>);//use the flash cards with random features
 
 int main(){
     vector<flashCard> allFlashCards = {};
@@ -32,6 +34,9 @@ int main(){
 
     int userChoice;
     cin >> userChoice;
+
+    cout << "testing file reading" << endl;
+    readingFlashCard(allFlashCards);
 }
 
 bool isEmpty(){
@@ -48,22 +53,21 @@ bool isEmpty(){
             return false;
     }
 }
+
 void readingFlashCard(vector<flashCard> &flashCardsStorage){
-    //expects valid file
     ifstream readingFile;
     readingFile.open("flashCard.txt");
+    string tempString;
 
-    string storedLine;
     int currentIndex = 0;
-    while(getline(readingFile, storedLine)){
-        //check for "Q." or "A." in the file
-        flashCardsStorage.push_back(flashCard());
-        if(storedLine.substr(0,'.') == "Q"){
-            //energy and mineral resources will have 14-20 questions
-            flashCardsStorage[currentIndex].question = storedLine.substr(storedLine.find('.') + 1);
-        }else if(storedLine.substr(0, '.') == "A"){
-            flashCardsStorage[currentIndex].answer = storedLine.substr(storedLine.find('.') + 1);
+    while(getline(readingFile, tempString)){
+        if(tempString.substr(0, tempString.find('.')) == "Q"){
+            flashCardsStorage.push_back(flashCard());
+            flashCardsStorage[currentIndex].question = tempString;
+            cout << flashCardsStorage[currentIndex].question << endl;
+        }else{
+            flashCardsStorage[currentIndex].answer = tempString;
+            cout << flashCardsStorage[currentIndex].answer << endl;
         }
-        currentIndex++;
     }
 }
