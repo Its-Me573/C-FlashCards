@@ -1,27 +1,31 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <random>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::cout;
+using std::ifstream;
+using std::ofstream;
+using std::endl;
+using std::getline;
+using std::cin;
 
 struct flashCard{
     string question;
     string answer;
 };
 
-bool isEmpty();//see if the flashCard file is empty
-void readingFlashCard(vector<flashCard> &);//reading the flash card
-void creatingFlashCard(vector<flashCard> &);//create new flashcard in the vector and add to the file with writingToFile
-void writingToFile(vector<flashCard> &);//writing flash card to file
-void useFlashCards(vector<flashCard>);//use the flash cards with random features
+bool isFileEmpty();
+void readingFlashCard(vector<flashCard> &);
+void creatingFlashCard(vector<flashCard> &);
+void writingToFile(vector<flashCard> &);
+int randomVectorIndex(vector<flashCard>);
+void useFlashCards(vector<flashCard>);
 
 int main(){
     vector<flashCard> allFlashCards;
-    string cardQuestion;
-    string cardAnswer;
-
-    string tempCardLine;
-
     //ask user for their selection
     //1. Use Flash cards
     //2. Make new flash card
@@ -44,12 +48,12 @@ int main(){
     
     for(int i = 0; i < allFlashCards.size(); i++){
         cout << allFlashCards[i].question << endl;
-        cout << allFlashCards[i].question << endl;
+        cout << allFlashCards[i].answer << endl;
     }
     
 }
 
-bool isEmpty(){
+bool isFileEmpty(){
     ifstream readingFile;
     readingFile.open("flashCard.txt");
     string storingLine = "";
@@ -57,10 +61,14 @@ bool isEmpty(){
     if(!getline(readingFile, storingLine)){
         return true;
     }else{
-        if(storingLine == "")
+        if(storingLine == ""){
+            readingFile.close();
             return true;
-        else
+        }
+        else{
+            readingFile.close();
             return false;
+        }
     }
 }
 
@@ -104,3 +112,15 @@ void writingToFile(vector<flashCard> &flashCardsStorage){
         writingFile << "A." << flashCardsStorage[i].answer << endl;
     }
 }
+
+int randomVectorIndex(vector<flashCard> flashCardsStorage){
+    int randomIndex;
+    std::random_device rand_dev;//creates random seed
+    std::mt19937 generator(rand_dev());//seed is input into the generator
+    std:: uniform_int_distribution<int> distr(0, flashCardsStorage.size() - 1);
+
+    randomIndex = distr(generator);
+    return randomIndex;
+}
+
+
