@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <random>
+#include <cctype>
 
 using std::vector;
 using std::string;
@@ -12,45 +13,23 @@ using std::endl;
 using std::getline;
 using std::cin;
 
+
 struct flashCard{
     string question;
     string answer;
 };
 
 bool isFileEmpty();
-void readingFlashCard(vector<flashCard> &);
+void readingCardFile(vector<flashCard> &);
 void creatingFlashCard(vector<flashCard> &);
 void writingToFile(vector<flashCard> &);
 int randomVectorIndex(vector<flashCard>);
 void useFlashCards(vector<flashCard>);
+void deleteFlashCard(vector<flashCard> &, int);
+void printAllCards(vector<flashCard>);
 
 int main(){
-    vector<flashCard> allFlashCards;
-    //ask user for their selection
-    //1. Use Flash cards
-    //2. Make new flash card
-    //3. Delete flash card
-    /**
-    cout << "What would you like to do?" << endl;
-    cout << "1. Use flash card" << endl
-         <<  "2. Make new flash card" << endl 
-         << "3. Delete flash card" << endl;
-    cout << "->(1,2,3)";
-
-    string userChoice;
-    getline(cin, userChoice);
-    int optionSeleceted = stoi(userChoice);
-    **/
-    readingFlashCard(allFlashCards);
-    creatingFlashCard(allFlashCards);
-    writingToFile(allFlashCards);
-    
-    
-    for(int i = 0; i < allFlashCards.size(); i++){
-        cout << allFlashCards[i].question << endl;
-        cout << allFlashCards[i].answer << endl;
-    }
-    
+    vector<flashCard> flashCardsHolder;
 }
 
 bool isFileEmpty(){
@@ -72,7 +51,7 @@ bool isFileEmpty(){
     }
 }
 
-void readingFlashCard(vector<flashCard> &flashCardsStorage){
+void readingCardFile(vector<flashCard> &flashCardsStorage){
     ifstream readingFile;
     readingFile.open("flashCard.txt");
     string tempString;
@@ -87,6 +66,7 @@ void readingFlashCard(vector<flashCard> &flashCardsStorage){
             currentIndex++;
         }
     }
+    readingFile.close();
 }
 
 void creatingFlashCard(vector<flashCard> &flashCardsStorage){
@@ -111,6 +91,7 @@ void writingToFile(vector<flashCard> &flashCardsStorage){
         writingFile << "Q." << flashCardsStorage[i].question << endl;
         writingFile << "A." << flashCardsStorage[i].answer << endl;
     }
+    writingFile.close();
 }
 
 int randomVectorIndex(vector<flashCard> flashCardsStorage){
@@ -123,4 +104,39 @@ int randomVectorIndex(vector<flashCard> flashCardsStorage){
     return randomIndex;
 }
 
+void useFlashCards(vector<flashCard> flashCardsStorage){
+    bool firstRun = true;
+    while(true){
+        if(firstRun){
+            cout << "Press enter to use flash cards, press 'q' to quit: ";
+            firstRun = false;
+        }else{
+            cout << "q/enter: ";
+        }
+        string userInput = "";
+        getline(cin, userInput);
+        
+        if(std::tolower(userInput[0]) == 'q'){
+            return;
+        }
 
+        int currentRandomIndex = randomVectorIndex(flashCardsStorage);
+        cout << flashCardsStorage[currentRandomIndex].question << endl;
+        cout << "Press enter to show answer";
+        string tempContinue;
+        getline(cin, tempContinue);
+        cout << flashCardsStorage[currentRandomIndex].answer << endl;
+    }
+    
+}
+
+void deleteFlashCard(vector<flashCard> &flashCardsStorage, int indexRemoved){
+    flashCardsStorage.erase(flashCardsStorage.begin() + (indexRemoved - 1));
+    writingToFile(flashCardsStorage);
+}
+
+void printAllCards(vector<flashCard> flashCardsStorage){
+    for(int i = 0; i < flashCardsStorage.size(); i++){
+        cout << (i + 1) << ".) " << flashCardsStorage[i].question << endl;
+    }
+}
