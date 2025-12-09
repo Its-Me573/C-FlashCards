@@ -42,32 +42,58 @@ int main(){
     while(true){
         //add logic to check for an empty file, keep content in file if not empty
 
-        
         cout << "1. Create new flash card" << endl
              << "2. Delete Flash Card" << endl
              << "3. Print all flash cards" << endl
              << "4. Use flash cards" << endl
              << "5. Quit" << endl;
 
-        int menuUserSelection = getUserInputInRange(1, 5, "(1/2/3/4/5): ", "Invalid selection!");        
+        int menuUserSelection = getUserInputInRange(1, 5, "(1/2/3/4/5): ", "Invalid selection!\n");        
         
+
+        if(!isFileEmpty()){
+            loadFlashCardsFromFile(flashCardsStorage);
+        }
         switch(menuUserSelection){// 1-4
             case 1:{//create new flash card
-                creatingFlashCard(flashCardsStorage);
-                writingToFile(flashCardsStorage);
+                if(isFileEmpty()){//if the array is empty
+                    creatingFlashCard(flashCardsStorage);
+                    writingToFile(flashCardsStorage);
+                }else{
+                    creatingFlashCard(flashCardsStorage);
+                    writingToFile(flashCardsStorage);
+                }
                 break;
             } 
             case 2:{//delete flash card
-                printAllCards(flashCardsStorage);
-                int flashCardBeingDeleted = getUserInputInRange(1, flashCardsStorage.size(), "What flash card would you like to delete: ", "Invalid Selection");
-                deleteFlashCard(flashCardsStorage, flashCardBeingDeleted);
-                writingToFile(flashCardsStorage);
+                if(isFileEmpty()){
+                    cout << "There are no flash cards to delete" << endl << endl;
+                }else{
+                    printAllCards(flashCardsStorage);
+                    int flashCardBeingDeleted = getUserInputInRange(1, flashCardsStorage.size(), "What flash card would you like to delete: ", "Invalid Selection");
+                    deleteFlashCard(flashCardsStorage, flashCardBeingDeleted);
+                    writingToFile(flashCardsStorage);
+                }
+                break;
             }
             case 3:{//print all flash cards
-                printAllCards(flashCardsStorage);
+                //if there are no flash cards, say there arent and ask user if they want to make any
+                if(isFileEmpty()){
+                    cout << "There are no flash cards to print" << endl << endl;
+                }else{
+                    printAllCards(flashCardsStorage);
+                }
+                break;
             }
             case 4:{//Use Flash Cards
-                useFlashCards(flashCardsStorage);
+                //if there arent any flashcards, prompt the user with the error and prompt that they need to make some
+                if(isFileEmpty()){
+                    cout << "There are no flash cards to use." << endl << endl;
+                }else{
+                    loadFlashCardsFromFile(flashCardsStorage);
+                    useFlashCards(flashCardsStorage);
+                }
+                break;
             }
             case 5:{//Quit
                 break;
@@ -128,16 +154,18 @@ void loadFlashCardsFromFile(vector<flashCard> &flashCardsStorage){
     readingFile.open("flashCards.txt");
     string tempString;
     
+    vector<flashCard> tempVector;
     int currentIndex = 0;
     while(getline(readingFile, tempString)){
         if(tempString.substr(0, tempString.find('.')) == "Q"){
-            flashCardsStorage.push_back(flashCard());
-            flashCardsStorage[currentIndex].question = tempString.substr(tempString.find('.') + 1);
-        }else{
-            flashCardsStorage[currentIndex].answer = tempString.substr(tempString.find('.') + 1);
+            tempVector.push_back(flashCard());
+            tempVector[currentIndex].question = tempString.substr(tempString.find('.') + 1);
+        }else if(tempString.substr(0, tempString.find('.')) == "A"){
+            tempVector[currentIndex].answer = tempString.substr(tempString.find('.') + 1);
             currentIndex++;
         }
     }
+    flashCardsStorage = tempVector;
     readingFile.close();
 }
 
@@ -153,6 +181,7 @@ void creatingFlashCard(vector<flashCard> &flashCardsStorage){
     cout << "Write the answer: ";
     getline(cin, flashCardHolder);
     flashCardsStorage[flashCardsStorage.size() - 1].answer = flashCardHolder;
+    cout << endl;
 }
 
 void writingToFile(const vector<flashCard> &flashCardsStorage){
@@ -165,7 +194,8 @@ void writingToFile(const vector<flashCard> &flashCardsStorage){
     }
     writingFile.close();
 }
-
+//to do: if the current random was the previous random index, make a new index
+// until soemthing differnet shows up
 int randomVectorIndex(vector<flashCard> flashCardsStorage){
     int randomIndex;
     std::random_device rand_dev;//creates random seed
@@ -209,4 +239,5 @@ void printAllCards(const vector<flashCard> &flashCardsStorage){
     for(int i = 0; i < flashCardsStorage.size(); i++){
         cout << (i + 1) << ".) " << flashCardsStorage[i].question << endl;
     }
+    cout << endl;
 }
