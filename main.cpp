@@ -40,85 +40,62 @@ int main(){
     }
     
     while(true){
-        /**
+        //add logic to check for an empty file, keep content in file if not empty
+
+        
         cout << "1. Create new flash card" << endl
              << "2. Delete Flash Card" << endl
              << "3. Print all flash cards" << endl
              << "4. Use flash cards" << endl
              << "5. Quit" << endl;
-        **/
 
-        //string tempStringSelection;
-        int menuUserSelection = getUserInputInRange(1, 5, "Invalid selection!", "(1/2/3/4/5): ");
+        int menuUserSelection = getUserInputInRange(1, 5, "(1/2/3/4/5): ", "Invalid selection!");        
         
-        
-        
-        
-        
-        /** 
-        do{
-            cout << "(1/2/3/4/5): ";
-            getline(cin, tempStringSelection);
-            
-            if(tempStringSelection.size() > 1 || //check for 1 in length
-               isalpha(tempStringSelection[0]) || //check if input is a character
-               stoi(tempStringSelection.substr(0,1)) != 1 && 
-               stoi(tempStringSelection.substr(0,1)) != 2 && 
-               stoi(tempStringSelection.substr(0,1)) != 3 &&
-               stoi(tempStringSelection.substr(0,1)) != 4 &&
-               stoi(tempStringSelection.substr(0,1)) != 5){
-                
-                cout << "Invalid Selection!" << endl;
-                continue;
-            }
-            menuUserSelection = stoi(tempStringSelection.substr(0,1));//set real int input
-            break;
-        }while(true);
-        **/
-
-        /**
         switch(menuUserSelection){// 1-4
             case 1:{//create new flash card
                 creatingFlashCard(flashCardsStorage);
+                writingToFile(flashCardsStorage);
+                break;
             } 
             case 2:{//delete flash card
                 printAllCards(flashCardsStorage);
-                do{//read the flash card to remove
-
-                }while(true);
-
+                int flashCardBeingDeleted = getUserInputInRange(1, flashCardsStorage.size(), "What flash card would you like to delete: ", "Invalid Selection");
+                deleteFlashCard(flashCardsStorage, flashCardBeingDeleted);
+                writingToFile(flashCardsStorage);
             }
             case 3:{//print all flash cards
-
+                printAllCards(flashCardsStorage);
             }
             case 4:{//Use Flash Cards
-
+                useFlashCards(flashCardsStorage);
             }
             case 5:{//Quit
-                return -1;
+                break;
             }
         }
-        **/
-
     }
 }
 
-int getUserInputInRange(int min, int max, string errorMessage, string inputMessage){//will return the valid number within the range, inclusive, "Message: "
+int getUserInputInRange(int min, int max, string inputMessage, string errorMessage){//will return the valid number within the range, inclusive, "Message: "
     string tempStringStorage;
-    cout << inputMessage;
+    int returningValidInt;
     do{
+            cout << inputMessage;
             getline(cin, tempStringStorage);
             
             if(tempStringStorage.size() > 1 || 
                !isdigit(tempStringStorage[0]) || //is index a digit
                isalpha(tempStringStorage[0]) || //is digit a char
-               (stoi(tempStringStorage.substr(0,1)) < min && 
+               (stoi(tempStringStorage.substr(0,1)) < min || 
                stoi(tempStringStorage.substr(0,1)) > max)){//is the int withing range
                 
                 cout << errorMessage << endl;
                 continue;
             }
+            returningValidInt = stoi(tempStringStorage.substr(0,1));
+            break;
         }while(true);
+    return returningValidInt;
 }
 
 void createFlashCardFile(){
@@ -129,7 +106,7 @@ void createFlashCardFile(){
 
 bool isFileEmpty(){
     ifstream readingFile;
-    readingFile.open("flashCard.txt");
+    readingFile.open("flashCards.txt");
     string storingLine = "";
 
     if(!getline(readingFile, storingLine)){
@@ -148,7 +125,7 @@ bool isFileEmpty(){
 
 void loadFlashCardsFromFile(vector<flashCard> &flashCardsStorage){
     ifstream readingFile;
-    readingFile.open("flashCard.txt");
+    readingFile.open("flashCards.txt");
     string tempString;
     
     int currentIndex = 0;
@@ -180,7 +157,7 @@ void creatingFlashCard(vector<flashCard> &flashCardsStorage){
 
 void writingToFile(const vector<flashCard> &flashCardsStorage){
     ofstream writingFile;
-    writingFile.open("flashCard.txt");
+    writingFile.open("flashCards.txt");
 
     for(int i = 0; i < flashCardsStorage.size(); i++){
         writingFile << "Q." << flashCardsStorage[i].question << endl;
